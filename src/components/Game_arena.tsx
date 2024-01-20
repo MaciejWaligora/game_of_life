@@ -163,8 +163,9 @@ export class GameArena extends Component<{}, GameArenaConfig> {
         const { x, y, width, height, color } = fillRectPositions[i];
         this.offscreenCtx!.fillStyle = color;
 
-        this.offscreenCtx?.fillRect(x, y, width, height);
+
         this.offscreenCtx?.strokeRect(x, y, width, height);
+        this.offscreenCtx?.fillRect(x, y, width, height);
       }
 
       this.canvas.current!.getContext('2d')?.drawImage(this.offscreenCanvas!, 0, 0);
