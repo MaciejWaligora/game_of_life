@@ -9,11 +9,13 @@ export interface GameArenaConfig {
 }
 
 export class GameArena extends Component<{}, GameArenaConfig> {
+
   private canvas: React.RefObject<HTMLCanvasElement>;
   private offscreenCanvas: OffscreenCanvas | null;
   private offscreenCtx: OffscreenCanvasRenderingContext2D | null;
   private grid: number[][];
   private clickEventListenerAdded: boolean = false;
+  private rectWidth: number;
 
   constructor(props: { width: number; height: number; resolution: number; fpsCounter: FrameCounter }) {
     super(props);
@@ -22,6 +24,7 @@ export class GameArena extends Component<{}, GameArenaConfig> {
     this.offscreenCanvas = null;
     this.offscreenCtx = null;
     this.grid = [];
+    this.rectWidth = props.width / props.resolution;
     this.state = {
       width: props.width,
       height: props.height,
@@ -35,14 +38,12 @@ export class GameArena extends Component<{}, GameArenaConfig> {
     this.renderStartGrid();
     this.addClickEventListener();
   }
-
   private setupOffscreenCanvas() {
     if ('OffscreenCanvas' in window) {
       this.offscreenCanvas = new OffscreenCanvas(this.state.width, this.state.height);
       this.offscreenCtx = this.offscreenCanvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
     }
   }
-
   private createGridArr(): number[][] {
     let gridArr = [];
     let line = [];
@@ -57,7 +58,7 @@ export class GameArena extends Component<{}, GameArenaConfig> {
   }
   private renderStartGrid(): void {
     this.grid = this.createGridArr();
-    const rectWidth = this.state.width / this.state.resolution;
+    const rectWidth = this.rectWidth;
     const ctx = this.canvas.current?.getContext('2d') as CanvasRenderingContext2D;
 
     ctx.strokeStyle = '#d3d3d3';
@@ -124,7 +125,7 @@ export class GameArena extends Component<{}, GameArenaConfig> {
     this.grid = newGrid;
   }
   private renderNewFrame(): void {
-    const rectWidth = this.state.width / this.state.resolution;
+    const rectWidth = this.rectWidth;
     const fillRectPositions: { x: number; y: number; width: number; height: number; color: string }[] = [];
     let y = 0;
 
@@ -147,23 +148,22 @@ export class GameArena extends Component<{}, GameArenaConfig> {
     }
 
     if (this.offscreenCtx) {
-      fillRectPositions.forEach(({ x, y, width, height, color }) => {
+      this.offscreenCtx!.strokeStyle = '#d3d3d3';
+      for (let i = 0; i < fillRectPositions.length; i++) {
+        const { x, y, width, height, color } = fillRectPositions[i];
         this.offscreenCtx!.fillStyle = color;
-        this.offscreenCtx!.strokeStyle = '#d3d3d3';
+
         this.offscreenCtx?.fillRect(x, y, width, height);
         this.offscreenCtx?.strokeRect(x, y, width, height);
-      });
-
-      // Transfer the offscreen canvas content to the visible canvas
-      if (this.canvas.current && this.offscreenCanvas) {
-        this.canvas.current.getContext('2d')?.drawImage(this.offscreenCanvas, 0, 0);
       }
+
+      this.canvas.current!.getContext('2d')?.drawImage(this.offscreenCanvas!, 0, 0);
     }
   }
   private addClickEventListener(): void {
     if (!this.clickEventListenerAdded) {
       let self = this;
-      let rectWidth = this.state.width / this.state.resolution;
+      let rectWidth = this.rectWidth;
       let ctx = self.canvas.current?.getContext("2d") as CanvasRenderingContext2D;
 
       let canvasPos = {
@@ -229,6 +229,7 @@ export class GameArena extends Component<{}, GameArenaConfig> {
     };
     updateAndRender();
   }
+
   render() {
     return <canvas ref={this.canvas} width={this.state.width} height={this.state.height} />
   }
