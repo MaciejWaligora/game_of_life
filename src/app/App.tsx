@@ -15,7 +15,7 @@ function App() {
       resolution: 70,
       fpsCounter: frameCounterRef.current as FrameCounter,
       gridColor: "#333333",
-      deadTileColor: "#888888",
+      deadTileColor: "#a1a1a1",
       aliveTileColor: "#1a1a1a"
     };
     setGameConfig(config);
