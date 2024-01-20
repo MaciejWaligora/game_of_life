@@ -17,7 +17,6 @@ export class FrameCounter extends Component<{}, FrameCounterState> {
     };
 
   }
-
   private _updateFPS = () => {
     const currentTimeStamp = performance.now();
     const elapsedTime = currentTimeStamp - this.state.lastTimeStamp;
@@ -34,11 +33,9 @@ export class FrameCounter extends Component<{}, FrameCounterState> {
 
     requestAnimationFrame(this._updateFPS);
   };
-
   public componentDidMount() {
     this._updateFPS();
   }
-
   public render() {
     let backgroundColor = '';
     if (this.state.currentFps < 21) {
@@ -60,14 +57,12 @@ export class FrameCounter extends Component<{}, FrameCounterState> {
       </div>
     );
   }
-
   public tick() {
     this.setState((prevState) => ({
       ...prevState,
       frames: prevState.frames + 1,
     }));
   }
-
   public reset() {
     this.setState({
       frames: 0,
@@ -75,7 +70,6 @@ export class FrameCounter extends Component<{}, FrameCounterState> {
       currentFps: 0,
     })
   }
-
   public init() {
     this.setState({
       lastTimeStamp: performance.now(),

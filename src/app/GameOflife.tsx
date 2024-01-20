@@ -1,9 +1,9 @@
 import React, { createRef, useEffect, useState } from 'react';
-import './App.css';
+import './GameOflife.css';
 import { FrameCounter } from '../components/Frame_Counter';
 import { GameArena, GameArenaConfig } from '../components/Game_arena';
 
-function App() {
+function GameOflife() {
   const frameCounterRef = createRef<FrameCounter>();
   const gameArenaRef = createRef<GameArena>();
   const [gameConfig, setGameConfig] = useState<GameArenaConfig | null>(null);
@@ -22,7 +22,7 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
+    <div className="GameOflife">
       <div className="top_bar" style={{ width: gameConfig?.width }}>
         <div className="frame_counter_container">
           <FrameCounter ref={frameCounterRef} />
@@ -46,4 +46,4 @@ function App() {
   );
 }
 
-export default App;
+export default GameOflife;
