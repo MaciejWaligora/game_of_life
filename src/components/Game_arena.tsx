@@ -8,29 +8,41 @@ export interface GameArenaConfig{
     height: number;
 }
 
-export class GameArena extends Component<{},GameArenaConfig>{
+export class GameArena extends Component<{}, GameArenaConfig> {
+  private canvas: React.RefObject<HTMLCanvasElement>;
+  private offscreenCanvas: OffscreenCanvas | null;
+  private offscreenCtx: OffscreenCanvasRenderingContext2D | null;
+  private grid: number[][];
+  private clickEventListenerAdded: boolean = false;
 
-    private canvas: React.RefObject<HTMLCanvasElement>;
-    private grid: number[][];
-    private clickEventListenerAdded: boolean = false;
+  constructor(props: { width: number; height: number; resolution: number; fpsCounter: FrameCounter }) {
+    super(props);
 
-    constructor(props: {width:number, height: number, resolution: number, fpsCounter: FrameCounter}){
-        super(props)
+    this.canvas = React.createRef<HTMLCanvasElement>();
+    this.offscreenCanvas = null;
+    this.offscreenCtx = null;
+    this.grid = [];
+    this.state = {
+      width: props.width,
+      height: props.height,
+      resolution: props.resolution,
+      fpsCounter: props.fpsCounter,
+    };
+  }
 
-        this.canvas = React.createRef<HTMLCanvasElement>();
-        this.grid = [];
-        this.state = {
-            width: props.width,
-            height: props.height,
-            resolution: props.resolution,
-            fpsCounter: props.fpsCounter,
-        }
+  public componentDidMount() {
+    this.setupOffscreenCanvas();
+    this.renderStartGrid();
+    this.addClickEventListener();
+  }
+
+  private setupOffscreenCanvas() {
+    if ('OffscreenCanvas' in window) {
+      this.offscreenCanvas = new OffscreenCanvas(this.state.width, this.state.height);
+      this.offscreenCtx = this.offscreenCanvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
     }
+  }
 
-    public componentDidMount() {
-        this.renderStartGrid();
-        this.addClickEventListener();
-      }
     private createGridArr(): number[][]{
         let gridArr = [];
         let line = [];
@@ -43,25 +55,28 @@ export class GameArena extends Component<{},GameArenaConfig>{
         }
         return gridArr;
       }
-    private renderStartGrid(): void{
+      private renderStartGrid(): void {
         this.grid = this.createGridArr();
-        const rectWidth = this.state.width/this.state.resolution;
-        let self = this;
-
-        // Get the 'context'
-        let ctx = self.canvas.current?.getContext("2d") as CanvasRenderingContext2D;
-        ctx.strokeStyle = "#d3d3d3"; // rectangle color
+        const rectWidth = this.state.width / this.state.resolution;
+        const ctx = this.canvas.current?.getContext('2d') as CanvasRenderingContext2D;
+    
+        ctx.strokeStyle = '#d3d3d3';
         let x = 0;
         let y = 0;
-        for (let ii = 0; ii < self.state.resolution; ii++) {
-          for (let i = 0; i < self.state.resolution; i++) {
+    
+        for (let ii = 0; ii < this.state.resolution; ii++) {
+          for (let i = 0; i < this.state.resolution; i++) {
             ctx.strokeRect(x, y, rectWidth, rectWidth);
             x += rectWidth;
           }
           y += rectWidth;
           x = 0;
         }
-
+    
+        // Transfer the offscreen canvas content to the visible canvas
+        if (this.offscreenCanvas && this.canvas.current) {
+          this.canvas.current.getContext('2d')?.drawImage(this.offscreenCanvas, 0, 0);
+        }
       }
     private createNewGrid(): void {  
         const currentGrid = this.grid;
@@ -108,25 +123,41 @@ export class GameArena extends Component<{},GameArenaConfig>{
     
         this.grid = newGrid;
       }
-    private renderNewFrame(): void {
-        const ctx = this.canvas.current?.getContext("2d") as CanvasRenderingContext2D;
+      private renderNewFrame(): void {
         const rectWidth = this.state.width / this.state.resolution;
-        const d3Color = "#d3d3d3";
+        const fillRectPositions: { x: number; y: number; width: number; height: number; color: string }[] = [];
         let y = 0;
-    
-        ctx.strokeStyle = d3Color;
     
         for (let ii = 0; ii < this.state.resolution; ii++) {
           let x = 0;
     
           for (let i = 0; i < this.state.resolution; i++) {
-            ctx.fillStyle = this.grid[ii][i] ? "#000000" : "#ffffff";
-            ctx.fillRect(x, y, rectWidth, rectWidth);
-            ctx.strokeRect(x, y, rectWidth, rectWidth);
+            const color = this.grid[ii][i] ? '#000000' : '#ffffff';
+            fillRectPositions.push({
+              x,
+              y,
+              width: rectWidth,
+              height: rectWidth,
+              color,
+            });
             x += rectWidth;
           }
     
           y += rectWidth;
+        }
+    
+        if (this.offscreenCtx) {
+          fillRectPositions.forEach(({ x, y, width, height, color }) => {
+            this.offscreenCtx!.fillStyle = color;
+            this.offscreenCtx!.strokeStyle = '#d3d3d3';
+            this.offscreenCtx?.fillRect(x, y, width, height);
+            this.offscreenCtx?.strokeRect(x, y, width, height);
+          });
+    
+          // Transfer the offscreen canvas content to the visible canvas
+          if (this.canvas.current && this.offscreenCanvas) {
+            this.canvas.current.getContext('2d')?.drawImage(this.offscreenCanvas, 0, 0);
+          }
         }
       }
     private addClickEventListener(): void {

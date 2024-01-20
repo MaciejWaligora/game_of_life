@@ -9,17 +9,15 @@ function App() {
   const [gameConfig, setGameConfig] = useState<GameArenaConfig | null>(null);
 
   useEffect(() => {
-    // This useEffect runs once after the components are mounted
     const config: GameArenaConfig = {
       width: 800,
       height: 600,
-      resolution: 80,
+      resolution: 70,
       fpsCounter: frameCounterRef.current as FrameCounter,
     };
-
-    // Update the state with the configuration
     setGameConfig(config);
   }, []);
+  
   return (
     <div className="App">
       <FrameCounter ref={frameCounterRef}/>
