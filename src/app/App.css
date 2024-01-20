@@ -22,38 +22,27 @@
 }
 
 .frame_counter_container {
-  /* Add your styling for the FrameCounter here */
   order: 1;
-  /* Set the order to 1 to move it to the left */
 }
 
 .controls_container {
   display: flex;
   order: 2;
-  /* Set the order to 2 to move it to the right */
 }
 
-/* Style for buttons in the controls container */
 .play_button,
 .stop_button,
 .restart_button {
   margin-right: 10px;
-  /* Adjust as needed for spacing between buttons */
   background-color: #555;
-  /* Dark background color for buttons */
   color: #fff;
-  /* Light text color for better visibility on dark background */
   font-family: 'Courier New', 'Courier', monospace;
 }
 
 .display_container {
   margin-top: 5px;
-  /* Adjust as needed for spacing between top bar and display container */
 }
 
 button {
   width: 100px;
 }
-
-/* Optional: Style for FrameCounter if needed */
-.frame_counter_container {}
