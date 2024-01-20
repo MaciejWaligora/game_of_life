@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useState} from 'react';
+import React, { createRef, useEffect, useState } from 'react';
 import './App.css';
 import { FrameCounter } from '../components/Frame_Counter';
 import { GameArena, GameArenaConfig } from '../components/Game_arena';
@@ -14,18 +14,35 @@ function App() {
       height: 600,
       resolution: 70,
       fpsCounter: frameCounterRef.current as FrameCounter,
+      gridColor: "#333333",
+      deadTileColor: "#888888",
+      aliveTileColor: "#1a1a1a"
     };
     setGameConfig(config);
   }, []);
-  
+
   return (
     <div className="App">
-      <FrameCounter ref={frameCounterRef}/>
-      {gameConfig && <GameArena ref={gameArenaRef} {...gameConfig} />}
-      <button onClick={
-        ()=>{gameArenaRef.current?.play()}
-        }>Start</button>
-    </div>
+      <div className="top_bar" style={{ width: gameConfig?.width }}>
+        <div className="frame_counter_container">
+          <FrameCounter ref={frameCounterRef} />
+        </div>
+        <div className="controls_container">
+          <button className="play_button" onClick={
+            () => { gameArenaRef.current?.play() }
+          }>Start</button>
+          <button className="stop_button" onClick={
+            () => { gameArenaRef.current?.stop() }
+          }>Stop</button>
+          <button className="restart_button" onClick={
+            () => { gameArenaRef.current?.restartGame() }
+          }>Restart</button>
+        </div>
+      </div>
+      <div className="display_container">
+        {gameConfig && <GameArena ref={gameArenaRef} {...gameConfig} />}
+      </div>
+    </div >
   );
 }
 

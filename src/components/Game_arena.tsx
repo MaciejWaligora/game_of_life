@@ -6,6 +6,9 @@ export interface GameArenaConfig {
   resolution: number;
   width: number;
   height: number;
+  aliveTileColor: string;
+  deadTileColor: string;
+  gridColor: string
 }
 
 export class GameArena extends Component<{}, GameArenaConfig> {
@@ -16,8 +19,9 @@ export class GameArena extends Component<{}, GameArenaConfig> {
   private grid: number[][];
   private clickEventListenerAdded: boolean = false;
   private rectWidth: number;
+  private isPlaying = false;
 
-  constructor(props: { width: number; height: number; resolution: number; fpsCounter: FrameCounter }) {
+  constructor(props: { width: number; height: number; resolution: number; fpsCounter: FrameCounter; aliveTileColor: string; deadTileColor: string; gridColor: string }) {
     super(props);
 
     this.canvas = React.createRef<HTMLCanvasElement>();
@@ -30,6 +34,9 @@ export class GameArena extends Component<{}, GameArenaConfig> {
       height: props.height,
       resolution: props.resolution,
       fpsCounter: props.fpsCounter,
+      aliveTileColor: props.aliveTileColor,
+      deadTileColor: props.deadTileColor,
+      gridColor: props.gridColor
     };
   }
 
@@ -38,6 +45,7 @@ export class GameArena extends Component<{}, GameArenaConfig> {
     this.renderStartGrid();
     this.addClickEventListener();
   }
+
   private setupOffscreenCanvas() {
     if ('OffscreenCanvas' in window) {
       this.offscreenCanvas = new OffscreenCanvas(this.state.width, this.state.height);
@@ -61,13 +69,15 @@ export class GameArena extends Component<{}, GameArenaConfig> {
     const rectWidth = this.rectWidth;
     const ctx = this.canvas.current?.getContext('2d') as CanvasRenderingContext2D;
 
-    ctx.strokeStyle = '#d3d3d3';
+    ctx.strokeStyle = this.state.gridColor;
+    ctx.fillStyle = this.state.deadTileColor;
     let x = 0;
     let y = 0;
 
     for (let ii = 0; ii < this.state.resolution; ii++) {
       for (let i = 0; i < this.state.resolution; i++) {
         ctx.strokeRect(x, y, rectWidth, rectWidth);
+        ctx.fillRect(x, y, rectWidth, rectWidth);
         x += rectWidth;
       }
       y += rectWidth;
@@ -133,7 +143,7 @@ export class GameArena extends Component<{}, GameArenaConfig> {
       let x = 0;
 
       for (let i = 0; i < this.state.resolution; i++) {
-        const color = this.grid[ii][i] ? '#000000' : '#ffffff';
+        const color = this.grid[ii][i] ? this.state.aliveTileColor : this.state.deadTileColor;
         fillRectPositions.push({
           x,
           y,
@@ -148,7 +158,7 @@ export class GameArena extends Component<{}, GameArenaConfig> {
     }
 
     if (this.offscreenCtx) {
-      this.offscreenCtx!.strokeStyle = '#d3d3d3';
+      this.offscreenCtx!.strokeStyle = this.state.gridColor;
       for (let i = 0; i < fillRectPositions.length; i++) {
         const { x, y, width, height, color } = fillRectPositions[i];
         this.offscreenCtx!.fillStyle = color;
@@ -182,8 +192,8 @@ export class GameArena extends Component<{}, GameArenaConfig> {
           let rectXpos = Math.floor((event.x - canvasPos.x) / rectWidth);
           let rectYpos = Math.floor((event.y - canvasPos.y) / rectWidth);
           if (self.grid[rectYpos][rectXpos] === 0) {
-            ctx.strokeStyle = "#d3d3d3";
-            ctx.fillStyle = "#000000";
+            ctx.strokeStyle = self.state.gridColor;
+            ctx.fillStyle = self.state.aliveTileColor;
             self.grid[rectYpos][rectXpos] = 1;
             ctx.fillRect(
               rectWidth * rectXpos,
@@ -199,7 +209,7 @@ export class GameArena extends Component<{}, GameArenaConfig> {
             );
           } else {
             self.grid[rectYpos][rectXpos] = 0;
-            ctx.fillStyle = "#ffffff";
+            ctx.fillStyle = self.state.deadTileColor;
             ctx.fillRect(
               rectWidth * rectXpos,
               rectWidth * rectYpos,
@@ -221,15 +231,30 @@ export class GameArena extends Component<{}, GameArenaConfig> {
   }
   public play() {
     this.state.fpsCounter.init();
+    this.isPlaying = true;
     const updateAndRender = () => {
       this.createNewGrid();
       this.renderNewFrame();
       this.state.fpsCounter.tick();
-      requestAnimationFrame(updateAndRender);
+      if (this.isPlaying) {
+        requestAnimationFrame(updateAndRender);
+      }
     };
-    updateAndRender();
-  }
 
+    updateAndRender();
+
+  }
+  public stop() {
+    if (this.isPlaying) {
+      this.state.fpsCounter.reset();
+      this.isPlaying = false;
+    }
+  }
+  public restartGame() {
+    this.stop();
+    this.renderStartGrid();
+    this.renderNewFrame();
+  }
   render() {
     return <canvas ref={this.canvas} width={this.state.width} height={this.state.height} />
   }
