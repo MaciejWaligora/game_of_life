@@ -3,20 +3,20 @@ import './GameOflife.css';
 import { FrameCounter } from '../components/Frame_Counter';
 import { GameArena, GameArenaConfig } from '../components/Game_arena';
 
-function GameOflife() {
+function GameOflife(props: { width: number, height: number, resolution: number, gridColor: string, deadTileColor: string, aliveTileColor: string }) {
   const frameCounterRef = createRef<FrameCounter>();
   const gameArenaRef = createRef<GameArena>();
   const [gameConfig, setGameConfig] = useState<GameArenaConfig | null>(null);
 
   useEffect(() => {
     const config: GameArenaConfig = {
-      width: 800,
-      height: 600,
-      resolution: 70,
+      width: props.width,
+      height: props.height,
+      resolution: props.resolution,
       fpsCounter: frameCounterRef.current as FrameCounter,
-      gridColor: "#333333",
-      deadTileColor: "#a1a1a1",
-      aliveTileColor: "#1a1a1a"
+      gridColor: props.gridColor,
+      deadTileColor: props.deadTileColor,
+      aliveTileColor: props.aliveTileColor
     };
     setGameConfig(config);
   }, []);

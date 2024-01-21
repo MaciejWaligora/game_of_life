@@ -39,11 +39,11 @@ export class FrameCounter extends Component<{}, FrameCounterState> {
   public render() {
     let backgroundColor = '';
     if (this.state.currentFps < 21) {
-      backgroundColor = 'rgba(255, 0, 0, 0.3)'; // Red with 50% transparency
+      backgroundColor = 'rgba(255, 0, 0, 0.2)'; // Red with 50% transparency
     } else if (this.state.currentFps < 24) {
-      backgroundColor = 'rgba(255, 255, 0, 0.3)'; // Yellow with 50% transparency
+      backgroundColor = 'rgba(255, 255, 0, 0.2)'; // Yellow with 50% transparency
     } else {
-      backgroundColor = 'rgba(55, 255, 0, 0.3)'; // Green with 50% transparency
+      backgroundColor = 'rgba(55, 255, 0, 0.2)'; // Green with 50% transparency
     }
 
     const divStyle = {
