@@ -83,11 +83,6 @@ export class GameArena extends Component<{}, GameArenaConfig> {
       y += rectWidth;
       x = 0;
     }
-
-    // Transfer the offscreen canvas content to the visible canvas
-    if (this.offscreenCanvas && this.canvas.current) {
-      this.canvas.current.getContext('2d')?.drawImage(this.offscreenCanvas, 0, 0);
-    }
   }
   private createNewGrid(): void {
     const currentGrid = this.grid;

@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useState } from 'react';
+import { createRef, useEffect, useState } from 'react';
 import './GameOflife.css';
 import { FrameCounter } from '../components/Frame_Counter';
 import { GameArena, GameArenaConfig } from '../components/Game_arena';
