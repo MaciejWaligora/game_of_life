@@ -7,7 +7,7 @@ on:
 permissions:
   contents: write
 jobs:
-  build:
+  build and deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,15 +28,6 @@ jobs:
     - name: Print Absolute Path to Build Directory
       run: ls /home/runner/work/game_of_life/game_of_life/build
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-
-    - name: Print Absolute Path to Build Directory
-      run: ls /home/runner/work/game_of_life/game_of_life
-      
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@releases/v4
       with:
