@@ -9,7 +9,7 @@ const root = ReactDOM.createRoot(
 
 const props = {
   width: 800,
-  height: 600,
+  height: 800,
   resolution: 70,
   gridColor: '#888888',
   deadTileColor: '#666666',
