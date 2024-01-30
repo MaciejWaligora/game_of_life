@@ -19,7 +19,7 @@ function GameOflife(props: { width: number, height: number, resolution: number, 
       aliveTileColor: props.aliveTileColor
     };
     setGameConfig(config);
-  }, []);
+  }, [props.width, props.height, props.resolution, props.gridColor, props.deadTileColor, props.aliveTileColor, frameCounterRef]);
 
   return (
     <div className="GameOflife">

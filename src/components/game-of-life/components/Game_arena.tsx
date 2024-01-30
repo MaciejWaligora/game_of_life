@@ -163,10 +163,6 @@ export class GameArena extends Component<{}, GameArenaConfig> {
   private addClickListener(): void {
     const canvas = this.canvas.current; // Assuming this.canvas is your canvas element
     const rectWidth = this.rectWidth;
-    const tilesPerRow = this.state.resolution;
-
-
-
     const clickHandler = (event: MouseEvent) => {
       const rect = canvas!.getBoundingClientRect();
       const mouseX = event.clientX - rect.left;
@@ -175,7 +171,6 @@ export class GameArena extends Component<{}, GameArenaConfig> {
       // Calculate the clicked tile position
       const column = Math.floor(mouseX / (rectWidth + 1));
       const row = Math.floor(mouseY / (rectWidth + 1));
-      const index = row * tilesPerRow + column;
 
 
       this.grid[row][column] = this.grid[row][column] ? 0 : 1;
