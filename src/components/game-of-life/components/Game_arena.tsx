@@ -28,7 +28,7 @@ export class GameArena extends Component<{}, GameArenaConfig> {
     this.offscreenCanvas = null;
     this.offscreenCtx = null;
     this.grid = [];
-    this.rectWidth = props.width / props.resolution;
+    this.rectWidth = (props.width / props.resolution) - 1;
     this.state = {
       width: props.width,
       height: props.height,
@@ -42,8 +42,9 @@ export class GameArena extends Component<{}, GameArenaConfig> {
 
   public componentDidMount() {
     this.setupOffscreenCanvas();
+
     this.renderStartGrid();
-    this.addClickEventListener();
+
   }
   private setupOffscreenCanvas() {
     if ('OffscreenCanvas' in window) {
@@ -65,22 +66,9 @@ export class GameArena extends Component<{}, GameArenaConfig> {
   }
   private renderStartGrid(): void {
     this.grid = this.createGridArr();
-    const rectWidth = this.rectWidth;
-    const ctx = this.canvas.current?.getContext('2d') as CanvasRenderingContext2D;
-
-    ctx.strokeStyle = this.state.gridColor;
-    ctx.fillStyle = this.state.deadTileColor;
-    let x = 0;
-    let y = 0;
-
-    for (let ii = 0; ii < this.state.resolution; ii++) {
-      for (let i = 0; i < this.state.resolution; i++) {
-        ctx.strokeRect(x, y, rectWidth, rectWidth);
-        ctx.fillRect(x, y, rectWidth, rectWidth);
-        x += rectWidth;
-      }
-      y += rectWidth;
-      x = 0;
+    this.renderNewFrame();
+    if (!this.clickEventListenerAdded) {
+      this.addClickListener();
     }
   }
   private createNewGrid(): void {
@@ -140,9 +128,8 @@ export class GameArena extends Component<{}, GameArenaConfig> {
   private renderNewFrame(): void {
     const rectWidth = this.rectWidth;
     const fillRectPositions: { x: number; y: number; width: number; height: number; color: string }[] = [];
-    const space = 1; // Set the space between tiles
     const startX = 0;
-    const incrementY = rectWidth + space;
+    const incrementY = rectWidth + 1;
     const tilesPerRow = this.state.resolution;
     const currentFrame = this.combineRows(this.grid);
     for (let i = 0; i < currentFrame.length; i++) {
@@ -175,65 +162,34 @@ export class GameArena extends Component<{}, GameArenaConfig> {
       this.canvas.current!.getContext('2d')?.drawImage(this.offscreenCanvas!, 0, 0);
     }
   }
-  private addClickEventListener(): void {
-    if (!this.clickEventListenerAdded) {
-      let self = this;
-      let rectWidth = this.rectWidth;
-      let ctx = self.canvas.current?.getContext("2d") as CanvasRenderingContext2D;
 
-      let canvasPos = {
-        x: self.canvas.current?.getBoundingClientRect().x || 0,
-        y: self.canvas.current?.getBoundingClientRect().y || 0,
-      };
+  private addClickListener(): void {
+    const canvas = this.canvas.current; // Assuming this.canvas is your canvas element
+    const rectWidth = this.rectWidth;
+    const tilesPerRow = this.state.resolution;
 
-      window.addEventListener('click', function (event) {
-        event.stopPropagation();
-        if (
-          event.x >= canvasPos.x &&
-          event.x <= canvasPos.x + self.state.width &&
-          event.y >= canvasPos.y &&
-          event.y <= canvasPos.y + self.state.height
-        ) {
-          let rectXpos = Math.floor((event.x - canvasPos.x) / rectWidth);
-          let rectYpos = Math.floor((event.y - canvasPos.y) / rectWidth);
-          if (self.grid[rectYpos][rectXpos] === 0) {
-            ctx.strokeStyle = self.state.gridColor;
-            ctx.fillStyle = self.state.aliveTileColor;
-            self.grid[rectYpos][rectXpos] = 1;
-            ctx.fillRect(
-              rectWidth * rectXpos,
-              rectWidth * rectYpos,
-              rectWidth,
-              rectWidth
-            );
-            ctx.strokeRect(
-              rectWidth * rectXpos,
-              rectWidth * rectYpos,
-              rectWidth,
-              rectWidth
-            );
-          } else {
-            self.grid[rectYpos][rectXpos] = 0;
-            ctx.fillStyle = self.state.deadTileColor;
-            ctx.fillRect(
-              rectWidth * rectXpos,
-              rectWidth * rectYpos,
-              rectWidth,
-              rectWidth
-            );
-            ctx.strokeRect(
-              rectWidth * rectXpos,
-              rectWidth * rectYpos,
-              rectWidth,
-              rectWidth
-            );
-          }
-        }
-      });
 
-      this.clickEventListenerAdded = true;
-    }
+
+    const clickHandler = (event: MouseEvent) => {
+      const rect = canvas!.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+
+      // Calculate the clicked tile position
+      const column = Math.floor(mouseX / (rectWidth + 1));
+      const row = Math.floor(mouseY / (rectWidth + 1));
+      const index = row * tilesPerRow + column;
+
+
+      this.grid[row][column] = this.grid[row][column] ? 0 : 1;
+      this.renderNewFrame();
+      event.preventDefault();
+      event.stopPropagation();
+    };
+    canvas?.addEventListener('click', clickHandler);
+    this.clickEventListenerAdded = true;
   }
+
   public play() {
     this.state.fpsCounter.init();
     this.isPlaying = true;
@@ -258,7 +214,6 @@ export class GameArena extends Component<{}, GameArenaConfig> {
   public restartGame() {
     this.stop();
     this.renderStartGrid();
-    this.renderNewFrame();
   }
   render() {
     return <canvas ref={this.canvas} width={this.state.width} height={this.state.height} />
