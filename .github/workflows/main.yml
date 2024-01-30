@@ -33,6 +33,9 @@ jobs:
     needs: build
 
     steps:
+
+     - name: Print Absolute Path to Build Directory
+      run: ls /home/runner/work/game_of_life/game_of_life
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@releases/v4
       with:
