@@ -25,7 +25,7 @@ jobs:
       run: npm run build
 
     - name: Print Absolute Path to Build Directory
-      run: echo $(pwd)/build
+      run: ls /build
 
   deploy:
     runs-on: ubuntu-latest
