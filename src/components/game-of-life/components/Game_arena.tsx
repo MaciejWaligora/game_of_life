@@ -45,7 +45,6 @@ export class GameArena extends Component<{}, GameArenaConfig> {
     this.renderStartGrid();
     this.addClickEventListener();
   }
-
   private setupOffscreenCanvas() {
     if ('OffscreenCanvas' in window) {
       this.offscreenCanvas = new OffscreenCanvas(this.state.width, this.state.height);

@@ -1,7 +1,7 @@
 import { createRef, useEffect, useState } from 'react';
 import './GameOflife.css';
-import { FrameCounter } from '../components/Frame_Counter';
-import { GameArena, GameArenaConfig } from '../components/Game_arena';
+import { FrameCounter } from './components/Frame_Counter';
+import { GameArena, GameArenaConfig } from './components/Game_arena';
 
 function GameOflife(props: { width: number, height: number, resolution: number, gridColor: string, deadTileColor: string, aliveTileColor: string }) {
   const frameCounterRef = createRef<FrameCounter>();
