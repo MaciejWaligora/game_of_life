@@ -128,28 +128,38 @@ export class GameArena extends Component<{}, GameArenaConfig> {
 
     this.grid = newGrid;
   }
+
+  private combineRows(frame: number[][]) {
+    let combined: number[] = [];
+    for (let i = 0; i < frame.length; i++) {
+      combined = [...combined, ...frame[i]];
+    }
+    return combined;
+  }
+
   private renderNewFrame(): void {
     const rectWidth = this.rectWidth;
     const fillRectPositions: { x: number; y: number; width: number; height: number; color: string }[] = [];
-    let y = 0;
-
-    for (let ii = 0; ii < this.state.resolution; ii++) {
-      let x = 0;
-
-      for (let i = 0; i < this.state.resolution; i++) {
-        const color = this.grid[ii][i] ? this.state.aliveTileColor : this.state.deadTileColor;
-        fillRectPositions.push({
-          x,
-          y,
-          width: rectWidth,
-          height: rectWidth,
-          color,
-        });
-        x += rectWidth;
-      }
-
-      y += rectWidth;
+    const space = 1; // Set the space between tiles
+    const startX = 0;
+    const incrementY = rectWidth + space;
+    const tilesPerRow = this.state.resolution;
+    const currentFrame = this.combineRows(this.grid);
+    for (let i = 0; i < currentFrame.length; i++) {
+      const color = currentFrame[i] ? this.state.aliveTileColor : this.state.deadTileColor;
+      const column = i % tilesPerRow; // Calculate the column position within the row
+      const row = Math.floor(i / tilesPerRow); // Calculate the row position
+      const x = startX + column * incrementY; // Adjusted calculation to start at x:10
+      const y = row * incrementY;
+      fillRectPositions.push({
+        x,
+        y,
+        width: rectWidth,
+        height: rectWidth,
+        color,
+      });
     }
+
 
     if (this.offscreenCtx) {
       this.offscreenCtx!.strokeStyle = this.state.gridColor;
