@@ -30,7 +30,7 @@ jobs:
 
     steps:
     - name: Deploy to GitHub Pages
-    run: ls -R build
+      run: ls -R build
       uses: JamesIves/github-pages-deploy-action@releases/v4
       with:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
