@@ -116,7 +116,6 @@ export class GameArena extends Component<{}, GameArenaConfig> {
 
     this.grid = newGrid;
   }
-
   private combineRows(frame: number[][]) {
     let combined: number[] = [];
     for (let i = 0; i < frame.length; i++) {
@@ -124,7 +123,6 @@ export class GameArena extends Component<{}, GameArenaConfig> {
     }
     return combined;
   }
-
   private renderNewFrame(): void {
     const rectWidth = this.rectWidth;
     const fillRectPositions: { x: number; y: number; width: number; height: number; color: string }[] = [];
@@ -162,7 +160,6 @@ export class GameArena extends Component<{}, GameArenaConfig> {
       this.canvas.current!.getContext('2d')?.drawImage(this.offscreenCanvas!, 0, 0);
     }
   }
-
   private addClickListener(): void {
     const canvas = this.canvas.current; // Assuming this.canvas is your canvas element
     const rectWidth = this.rectWidth;
@@ -189,7 +186,6 @@ export class GameArena extends Component<{}, GameArenaConfig> {
     canvas?.addEventListener('click', clickHandler);
     this.clickEventListenerAdded = true;
   }
-
   public play() {
     this.state.fpsCounter.init();
     this.isPlaying = true;
