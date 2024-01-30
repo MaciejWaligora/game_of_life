@@ -25,7 +25,7 @@ jobs:
       run: npm run build
 
     - name: List files in directory
-      run: ls ..
+      run: ls ../../..
 
   deploy:
     runs-on: ubuntu-latest
@@ -37,4 +37,4 @@ jobs:
       with:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         BRANCH: gh-pages
-        FOLDER: build
+        FOLDER: game_of_life/build
