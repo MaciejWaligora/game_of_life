@@ -182,19 +182,20 @@ export class GameArena extends Component<{}, GameArenaConfig> {
     this.clickEventListenerAdded = true;
   }
   public play() {
-    this.state.fpsCounter.init();
-    this.isPlaying = true;
-    const updateAndRender = () => {
-      this.createNewGrid();
-      this.renderNewFrame();
-      this.state.fpsCounter.tick();
-      if (this.isPlaying) {
-        requestAnimationFrame(updateAndRender);
-      }
-    };
+    if (!this.isPlaying) {
+      this.state.fpsCounter.init();
+      this.isPlaying = true;
+      const updateAndRender = () => {
+        this.createNewGrid();
+        this.renderNewFrame();
+        this.state.fpsCounter.tick();
+        if (this.isPlaying) {
+          requestAnimationFrame(updateAndRender);
+        }
+      };
 
-    updateAndRender();
-
+      updateAndRender();
+    }
   }
   public stop() {
     if (this.isPlaying) {
